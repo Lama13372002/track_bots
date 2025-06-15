@@ -164,38 +164,6 @@ export class TrackWallets {
     return
   }
 
-  public async listenForDatabaseChanges(): Promise<void> {
-    while (true) {
-      try {
-        const stream = await this.prismaWalletRepository.pulseWallet()
-
-        for await (const event of stream!) {
-          try {
-            console.log('New event:', event)
-
-            if (event.action === 'create') {
-              const createdWalletId = event.created.walletId
-              await this.setupWalletWatcher({ event: 'create', walletId: createdWalletId })
-            } else if (event.action === 'delete') {
-              const deletedWalletId = event.deleted.walletId
-              // await this.stopWatchingWallet(event.deleted.walletId)
-              await this.setupWalletWatcher({ event: 'delete', walletId: deletedWalletId })
-            } else if (event.action === 'update') {
-              const updatedUserId = event.after.userId
-              await this.setupWalletWatcher({ event: 'update', userId: updatedUserId })
-            }
-          } catch (eventError: any) {
-            console.error('Error processing event:', eventError.message)
-            throw eventError // This will exit the loop and trigger a reconnect
-          }
-        }
-      } catch (error: any) {
-        console.error('Connection lost. Attempting to reconnect...', error.message)
-        await new Promise((resolve) => setTimeout(resolve, 5000))
-      }
-    }
-  }
-
   public async stopWatching(): Promise<void> {
     for (const [wallet, subscriptionId] of this.walletWatcher.subscriptions) {
       RpcConnectionManager.logConnection.removeOnLogsListener(subscriptionId)
