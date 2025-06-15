@@ -69,7 +69,6 @@ class Main {
 
     // setup
     await this.trackWallets.setupWalletWatcher({ event: 'initial' })
-    await this.trackWallets.listenForDatabaseChanges()
   }
 }
 
