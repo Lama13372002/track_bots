@@ -154,7 +154,9 @@ export class TrackWallets {
         }
       }
 
-      walletsArray?.push(...allWallets!)
+      if (allWallets && allWallets.length > 0) {
+        walletsArray?.push(...allWallets)
+      }
       // console.log('WALLETS ARRAY:', walletsArray)
       return await this.walletWatcher.watchSocket(walletsArray!)
     }
